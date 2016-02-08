@@ -19,7 +19,6 @@ var codeArea = document.getElementById('CodeArea');
 var score = document.getElementById('score');
 codeArea.focus();
 
-var digramPeekArray = [null, null, null, null, null]
 var digramPeekTable = document.getElementById('digram-table');
 var digramTable = {}
 
@@ -77,13 +76,13 @@ function newLanguage(){
 			window.setTimeout(temp, 500);
 		} else {
 			getRandFile(function(t){
-				text = processDoc(t);
-				codeArea.innerHTML = 'Type Here!<BR>';
+			    text = processDoc(t);
+			    digramTable = populateDigramTable(text, {});
+			    codeArea.innerHTML = 'Type Here!<BR>';
 			});
 		}
 	}
     temp();
-    digramTable = populateDigramTable(text, {});
 }
 
 function populateDigramTable(text, digram_table) {
@@ -135,7 +134,15 @@ function update_table(last_char, digram_peek_array) {
 	sum += digram_peek_array[index][1];
     }
     one.innerHTML = (last_char + digram_peek_array[0][0]
-		     + ' ' + ((digram_peek_array[0][1] / sum) * 100));
+		     + ' ' + ((digram_peek_array[0][1] / sum) * 100).toFixed(3));
+    two.innerHTML = (last_char + digram_peek_array[1][0]
+		     + ' ' + ((digram_peek_array[1][1] / sum) * 100).toFixed(3));
+    three.innerHTML = (last_char + digram_peek_array[2][0]
+		     + ' ' + ((digram_peek_array[2][1] / sum) * 100).toFixed(3));
+    four.innerHTML = (last_char + digram_peek_array[3][0]
+		     + ' ' + ((digram_peek_array[3][1] / sum) * 100).toFixed(3));
+    five.innerHTML = (last_char + digram_peek_array[4][0]
+		     + ' ' + ((digram_peek_array[4][1] / sum) * 100).toFixed(3));
 }
 newLanguage();
 codeArea.onkeypress = keypressed;
