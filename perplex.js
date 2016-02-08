@@ -13,6 +13,7 @@ var text = '';
 var correct = 0;
 var total = 0;
 var perplexity = 'Unknown!';
+var lastChar = "\n";
 
 var codeArea = document.getElementById('CodeArea');
 var score = document.getElementById('score');
@@ -25,33 +26,34 @@ var digramTable = {}
 //https://api.github.com/search/repositories?q=language:JavaScript&sort=stars
 
 function keypressed(x){
-	if (text.length > 0){
-		//nextChar is the next character text
-		var nextChar = text.slice(0,1);
-		//removes the first character from text
-		text = text.slice(1);
-		
-		var c = (x.charCode == nextChar.charCodeAt(0)) ? 'g' : 'r';
-		
-		if (nextChar=='\n'){
-			nextChar = '\u2936<BR>';
-			if (x.charCode == 13)
-				c = 'g';
-		}
-		if (c=='g')
-			correct++
-		
-		var insert = '<span class='+c+'>'+nextChar+'</span>';
-		codeArea.innerHTML = codeArea.innerHTML+insert;
-		
-		total++;
-		perplexity = total/correct;
-		score.innerHTML = perplexity.toFixed(3);
-		
-	        console.log(x.charCode);
-	        digramPeekArray = digramTable[nextChar];
-	        update_table();
+    if (text.length > 0){
+	//nextChar is the next character text
+	var nextChar = text.slice(0,1);
+	//removes the first character from text
+	text = text.slice(1);
+	
+	var c = (x.charCode == nextChar.charCodeAt(0)) ? 'g' : 'r';
+	
+	if (nextChar=='\n'){
+	    nextChar = '\u2936<BR>';
+	    if (x.charCode == 13)
+		c = 'g';
 	}
+	if (c=='g')
+	    correct++
+	
+	var insert = '<span class='+c+'>'+nextChar+'</span>';
+	codeArea.innerHTML = codeArea.innerHTML+insert;
+	
+	total++;
+	perplexity = total/correct;
+	score.innerHTML = perplexity.toFixed(3);
+	
+	console.log(x.charCode);
+	digramPeekArray = digramTable[nextChar];
+	lastChar = nextChar;
+	update_table(lastChar, digramPeekArray);
+    }
 };
 
 function processDoc(text){
@@ -86,7 +88,6 @@ function newLanguage(){
 
 function populateDigramTable(text, digram_table) {
     var previous = text.slice(0,1);
-    var sum = 0;
     digram_table[previous] = {};
     for (index = 1; index <= text.slice(1).length; index++) {
 	var character = text[index];
@@ -102,7 +103,6 @@ function populateDigramTable(text, digram_table) {
 	    digram_table[previous] = {};
 	    digram_table[previous][character] = 1;
 	}
-	sum += 1;
 	previous = character;
     }
     var sorted_digram_table = {};
@@ -113,7 +113,7 @@ function populateDigramTable(text, digram_table) {
 	}
 	frequencies.sort(compare);
 	frequencies.reverse();
-	sorted_digram_table[item] = frequencies.slice(0,6);
+	sorted_digram_table[item] = frequencies;
     }
     return sorted_digram_table;
 }
@@ -123,7 +123,19 @@ function compare(a, b) {
     if (a[1] > b[1]) return 1;
     return 0;
 }
-	
-	
+
+function update_table(last_char, digram_peek_array) {
+    one = document.getElementById("digram-one");
+    two = document.getElementById("digram-two");
+    three = document.getElementById("digram-three");
+    four = document.getElementById("digram-four");
+    five = document.getElementById("digram-five");
+    var sum = 0;
+    for (index in digram_peek_array) {
+	sum += digram_peek_array[index][1];
+    }
+    one.innerHTML = (last_char + digram_peek_array[0][0]
+		     + ' ' + ((digram_peek_array[0][1] / sum) * 100));
+}
 newLanguage();
 codeArea.onkeypress = keypressed;
